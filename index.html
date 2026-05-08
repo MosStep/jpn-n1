@@ -454,11 +454,21 @@ function handleFlip() {
   flashcard.classList.toggle("is-flipped", isFlipped);
 }
 
+function handleSpeak() {
+  if (!currentDeck.length) return;
+  const item = currentDeck[currentIndex];
+  speakKana(item.kana);
+}
+
 function handleSpeakExample() {
   if (!currentDeck.length) return;
   const item = currentDeck[currentIndex];
   const [question] = item.example_sentence.split(" / ");
   speakKana(question ? question.trim() : item.example_sentence.trim());
+}
+
+function showSummary() {
+  showPanel(summaryPanel);
 }
 
 function handleNext() {
