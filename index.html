@@ -441,8 +441,12 @@ function renderCard() {
 }
 
 function handleLevelSelection(level) {
+  console.log('handleLevelSelection called with level:', level);
+  console.log('vocabData:', vocabData);
+  console.log('vocabData[level]:', vocabData[level]);
   currentLevel = level;
   currentDeck = vocabData[level].slice();
+  console.log('currentDeck after slice:', currentDeck.length, 'items');
   shuffle(currentDeck);
   currentIndex = 0;
   levelLabel.textContent = `ระดับ ${level.toUpperCase()}`;
@@ -484,7 +488,11 @@ function handleNext() {
 }
 
 levelButtons.forEach((button) => {
-  button.addEventListener("click", () => handleLevelSelection(button.dataset.level));
+  console.log('Adding click listener to button:', button);
+  button.addEventListener("click", () => {
+    console.log('Button clicked! level:', button.dataset.level);
+    handleLevelSelection(button.dataset.level);
+  });
 });
   flipBtn.addEventListener("click", handleFlip);
   speakBtn.addEventListener("click", handleSpeak);
