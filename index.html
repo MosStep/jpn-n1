@@ -351,8 +351,10 @@ p {
 </div>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+console.log('DOMContentLoaded event fired');
 try {
 const menuPanel = document.getElementById("menuPanel");
+console.log('menuPanel:', menuPanel);
 const cardPanel = document.getElementById("cardPanel");
 const summaryPanel = document.getElementById("summaryPanel");
 const levelLabel = document.getElementById("levelLabel");
