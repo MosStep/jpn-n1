@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Flashcard ญี่ปุ่น JLPT</title>
+<style>
+:root {
+  --bg: #0f172a;
+  --surface: #111827;
+  --surface-alt: #1f2937;
+  --text: #f8fafc;
+  --accent: #38bdf8;
+  --accent-strong: #60a5fa;
+  --border: rgba(148, 163, 184, 0.3);
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Inter", system-ui, sans-serif;
+  background: radial-gradient(circle at top, rgba(56, 189, 248, 0.12), transparent 25%),
+    linear-gradient(180deg, #0b1220 0%, #111827 100%);
+  color: var(--text);
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 20% 20%, rgba(56, 189, 248, 0.14), transparent 9%),
+    radial-gradient(circle at 90% 40%, rgba(168, 85, 247, 0.12), transparent 10%);
+  pointer-events: none;
+}
+.app {
+  position: relative;
+  z-index: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 28px 20px 40px;
+}
+section {
+  width: 100%;
+  margin: 0 auto;
+}
+.menu-panel,
+.card-panel,
+.summary-panel {
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 28px;
+  box-shadow: 0 20px 80px rgba(0, 0, 0, 0.28);
+  padding: 28px;
+}
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+h1 {
+  font-size: clamp(2rem, 2.5vw, 3rem);
+  line-height: 1.05;
+}
+h2 {
+  font-size: clamp(1.8rem, 2.2vw, 2.4rem);
+}
+p {
+  color: #cbd5e1;
+  margin-top: 12px;
+  line-height: 1.7;
+}
+.level-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 28px;
+}
+.level-btn,
+.control-btn,
+.secondary-btn {
+  border: none;
+  border-radius: 16px;
+  padding: 18px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+.level-btn {
+  background: linear-gradient(135deg, #7c3aed, #38bdf8);
+  color: #fff;
+  box-shadow: 0 18px 30px rgba(56, 189, 248, 0.18);
+}
+.level-btn:hover,
+.control-btn:hover,
+.secondary-btn:hover {
+  transform: translateY(-2px);
+}
+.secondary-btn {
+  background: transparent;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  color: var(--text);
+}
+.card-panel {
+  display: grid;
+  gap: 24px;
+}
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+}
+.status {
+  text-align: right;
+}
+.status span {
+  display: block;
+  font-size: 0.95rem;
+  color: #cbd5e1;
+}
+#levelLabel {
+  font-weight: 700;
+  color: #38bdf8;
+}
+.card-wrapper {
+  perspective: 1300px;
+  min-height: 420px;
+}
+.card {
+  width: 100%;
+  max-width: 760px;
+  min-height: 420px;
+  margin: 0 auto;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.8s cubic-bezier(0.4, 0.2, 0.2, 1);
+}
+.card.is-flipped {
+  transform: rotateY(180deg);
+}
+.card-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 28px;
+  overflow: hidden;
+  backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 32px;
+}
+.card-front {
+  background: linear-gradient(180deg, rgba(59, 130, 246, 0.9), rgba(15, 23, 42, 0.95));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  text-align: center;
+}
+.card-front .term {
+  font-size: clamp(3rem, 7vw, 5.5rem);
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  line-height: 0.95;
+}
+.card-back {
+  background: #0f172a;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  transform: rotateY(180deg);
+  color: #e2e8f0;
+}
+.back-content {
+  display: grid;
+  gap: 18px;
+  width: 100%;
+  max-width: 720px;
+}
+.back-row {
+  display: grid;
+  gap: 8px;
+}
+.back-row strong {
+  color: #f8fafc;
+}
+.card-back .reading {
+  font-size: 1.7rem;
+  color: #38bdf8;
+  font-weight: 700;
+}
+.reading-row {
+  display: grid;
+  gap: 10px;
+}
+.reading-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.mini-btn {
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  background: rgba(56, 189, 248, 0.12);
+  color: #38bdf8;
+  padding: 10px 14px;
+  border-radius: 999px;
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+.example-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.card-back .translation {
+  font-size: 1.35rem;
+  color: #fff;
+}
+.card-back .example {
+  padding: 18px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+}
+.example-question,
+.example-meaning {
+  line-height: 1.7;
+}
+.example-question {
+  color: #cbd5e1;
+}
+.example-meaning {
+  color: #94a3b8;
+}
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.control-btn {
+  flex: 1 1 200px;
+  max-width: 260px;
+  background: linear-gradient(135deg, #22d3ee, #8b5cf6);
+  color: #fff;
+  box-shadow: 0 18px 30px rgba(56, 189, 248, 0.2);
+}
+.summary-panel {
+  text-align: center;
+}
+.summary-panel p {
+  margin-top: 14px;
+}
+.summary-actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 24px;
+}
+@media (max-width: 768px) {
+  .level-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .card-wrapper {
+    min-height: 360px;
+  }
+  .card-front .term {
+    font-size: clamp(2.4rem, 10vw, 4rem);
+  }
+}
+@media (max-width: 520px) {
+  .level-grid {
+    grid-template-columns: 1fr;
+  }
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <section class="menu-panel" id="menuPanel">
+    <h1>Flashcard ญี่ปุ่น JLPT</h1>
+    <p>เลือกระดับเพื่อเริ่มท่องศัพท์ทันที</p>
+    <div class="level-grid">
+      <button class="level-btn" data-level="n5">N5</button>
+      <button class="level-btn" data-level="n4">N4</button>
+      <button class="level-btn" data-level="n3">N3</button>
+      <button class="level-btn" data-level="n2">N2</button>
+      <button class="level-btn" data-level="n1">N1</button>
+    </div>
+  </section>
+  <section class="card-panel" id="cardPanel" hidden>
+    <div class="header">
+      <button class="secondary-btn" id="backHomeBtn">กลับหน้าหลัก</button>
+      <div class="status">
+        <span id="levelLabel">ระดับ</span>
+        <span id="progressLabel">0 / 0</span>
+        <span id="deckCountLabel">จำนวนทั้งหมด 0</span>
+      </div>
+    </div>
+    <div class="card-wrapper">
+      <div class="card" id="flashcard" role="button" tabindex="0" aria-label="การ์ดคำศัพท์">
+        <div class="card-face card-front">
+          <div class="term" id="cardFront"></div>
+        </div>
+        <div class="card-face card-back">
+          <div class="back-content">
+            <div class="back-row reading-row">
+              <strong>เสียงอ่าน</strong>
+              <div class="reading-group">
+                <div class="reading" id="cardReading"></div>
+                <button class="mini-btn" id="playReadingBtn" type="button">ฟัง</button>
+              </div>
+            </div>
+            <div class="back-row">
+              <strong>ความหมาย</strong>
+              <div class="translation" id="cardTranslation"></div>
+            </div>
+            <div class="back-row example">
+              <strong>ตัวอย่าง</strong>
+              <div class="example-group">
+                <div class="example-question" id="cardExample"></div>
+                <button class="mini-btn" id="playExampleBtn" type="button">ฟัง</button>
+              </div>
+              <div class="example-meaning" id="cardExampleTranslation"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="control-btn" id="flipBtn">เฉลย / พลิกการ์ด</button>
+      <button class="control-btn" id="speakBtn">ฟังเสียงอ่าน</button>
+      <button class="control-btn" id="nextBtn">ถัดไป</button>
+    </div>
+  </section>
+  <section class="summary-panel" id="summaryPanel" hidden>
+    <h2>ยินดีด้วย</h2>
+    <p>คุณท่องจบกองนี้แล้ว!</p>
+    <div class="summary-actions">
+      <button class="control-btn" id="restartBtn">เริ่มใหม่ระดับเดิม</button>
+      <button class="secondary-btn" id="returnBtn">กลับหน้าหลัก</button>
+    </div>
+  </section>
+</div>
+<script>
+const menuPanel = document.getElementById("menuPanel");
+const cardPanel = document.getElementById("cardPanel");
+const summaryPanel = document.getElementById("summaryPanel");
+const levelLabel = document.getElementById("levelLabel");
+const progressLabel = document.getElementById("progressLabel");
+const deckCountLabel = document.getElementById("deckCountLabel");
+const cardFront = document.getElementById("cardFront");
+const cardReading = document.getElementById("cardReading");
+const cardTranslation = document.getElementById("cardTranslation");
+const cardExample = document.getElementById("cardExample");
+const cardExampleTranslation = document.getElementById("cardExampleTranslation");
+const flashcard = document.getElementById("flashcard");
+const flipBtn = document.getElementById("flipBtn");
+const speakBtn = document.getElementById("speakBtn");
+const playReadingBtn = document.getElementById("playReadingBtn");
+const playExampleBtn = document.getElementById("playExampleBtn");
+const nextBtn = document.getElementById("nextBtn");
+const backHomeBtn = document.getElementById("backHomeBtn");
+const restartBtn = document.getElementById("restartBtn");
+const returnBtn = document.getElementById("returnBtn");
+const levelButtons = document.querySelectorAll(".level-btn");
+let currentDeck = [];
+let currentLevel = "n5";
+let currentIndex = 0;
+let isFlipped = false;
+let speechVoice = null;
+
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+function showPanel(panel) {
+  menuPanel.hidden = panel !== menuPanel;
+  cardPanel.hidden = panel !== cardPanel;
+  summaryPanel.hidden = panel !== summaryPanel;
+}
+
+function getJapaneseVoice() {
+  const voices = window.speechSynthesis.getVoices();
+  return voices.find((voice) => voice.lang.startsWith("ja")) || voices.find((voice) => voice.lang === "ja-JP") || voices[0] || null;
+}
+
+function loadVoice() {
+  if (!window.speechSynthesis) return;
+  speechVoice = getJapaneseVoice();
+  if (!speechVoice) {
+    window.speechSynthesis.onvoiceschanged = () => {
+      speechVoice = getJapaneseVoice();
+    };
+  }
+}
+
+function speakKana(text) {
+  if (!window.speechSynthesis || !text) return;
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = "ja-JP";
+  utterance.rate = 0.95;
+  if (speechVoice) utterance.voice = speechVoice;
+  window.speechSynthesis.speak(utterance);
+}
+
+function updateProgress() {
+  progressLabel.textContent = `${Math.min(currentIndex + 1, currentDeck.length)} / ${currentDeck.length}`;
+  deckCountLabel.textContent = `จำนวนทั้งหมด ${currentDeck.length}`;
+}
+
+function renderCard() {
+  const item = currentDeck[currentIndex];
+  const displayTerm = item.kanji.trim() ? item.kanji : item.kana;
+  cardFront.textContent = displayTerm;
+  cardReading.textContent = item.kana;
+  cardTranslation.textContent = item.translation;
+  const [question, meaning] = item.example_sentence.split(" / ");
+  cardExample.textContent = question ? question.trim() : item.example_sentence.trim();
+  cardExampleTranslation.textContent = meaning ? meaning.trim() : "";
+  updateProgress();
+  if (isFlipped) {
+    flashcard.classList.remove("is-flipped");
+    isFlipped = false;
+  }
+}
+
+function handleLevelSelection(level) {
+  currentLevel = level;
+  currentDeck = vocabData[level].slice();
+  shuffle(currentDeck);
+  currentIndex = 0;
+  levelLabel.textContent = `ระดับ ${level.toUpperCase()}`;
+  renderCard();
+  showPanel(cardPanel);
+}
+
+function handleFlip() {
+  if (!currentDeck.length) return;
+  isFlipped = !isFlipped;
+  flashcard.classList.toggle("is-flipped", isFlipped);
+}
+
+function handleSpeakExample() {
+  if (!currentDeck.length) return;
+  const item = currentDeck[currentIndex];
+  const [question] = item.example_sentence.split(" / ");
+  speakKana(question ? question.trim() : item.example_sentence.trim());
+}
+
+function handleNext() {
+  if (!currentDeck.length) return;
+  if (currentIndex + 1 >= currentDeck.length) {
+    showSummary();
+    return;
+  }
+  currentIndex += 1;
+  renderCard();
+}
+
+try {
+  levelButtons.forEach((button) => {
+    button.addEventListener("click", () => handleLevelSelection(button.dataset.level));
+  });
+  flipBtn.addEventListener("click", handleFlip);
+  speakBtn.addEventListener("click", handleSpeak);
+  playReadingBtn.addEventListener("click", handleSpeak);
+  playExampleBtn.addEventListener("click", handleSpeakExample);
+  nextBtn.addEventListener("click", handleNext);
+  backHomeBtn.addEventListener("click", () => showPanel(menuPanel));
+  restartBtn.addEventListener("click", () => handleLevelSelection(currentLevel));
+  returnBtn.addEventListener("click", () => showPanel(menuPanel));
+  flashcard.addEventListener("click", handleFlip);
+  flashcard.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      handleFlip();
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (!cardPanel.hidden) {
+      if (event.key === "ArrowRight" || event.key === "Enter") {
+        event.preventDefault();
+        handleNext();
+      }
+      if (event.key === " " ) {
+        event.preventDefault();
+        handleFlip();
+      }
+    }
+  });
+
+  loadVoice();
+  showPanel(menuPanel);
+} catch (error) {
+  console.error("JavaScript initialization error:", error);
+}
+
+const vocabData = {
+  n5: [
+    { kanji: "今日", kana: "きょう", translation: "วันนี้", example_sentence: "今日は雨です。 / วันนี้ฝนตก" },
+    { kanji: "学校", kana: "がっこう", translation: "โรงเรียน", example_sentence: "私は学校へ行きます。 / ฉันไปโรงเรียน" },
+    { kanji: "先生", kana: "せんせい", translation: "คุณครู", example_sentence: "先生はやさしいです。 / ครูใจดี" },
+    { kanji: "食べる", kana: "たべる", translation: "กิน", example_sentence: "私はりんごを食べます。 / ฉันกินแอปเปิล" },
+    { kanji: "飲む", kana: "のむ", translation: "ดื่ม", example_sentence: "水を飲みたいです。 / อยากดื่มน้ำ" },
+    { kanji: "友だち", kana: "ともだち", translation: "เพื่อน", example_sentence: "友だちと話します。 / คุยกับเพื่อน" },
+    { kanji: "休み", kana: "やすみ", translation: "วันหยุด", example_sentence: "明日は休みです。 / พรุ่งนี้เป็นวันหยุด" },
+    { kanji: "本", kana: "ほん", translation: "หนังสือ", example_sentence: "本を読みます。 / อ่านหนังสือ" },
+    { kanji: "日本", kana: "にほん", translation: "ประเทศญี่ปุ่น", example_sentence: "日本へ行きたいです。 / อยากไปญี่ปุ่น" },
+    { kanji: "見る", kana: "みる", translation: "ดู", example_sentence: "テレビを見ます。 / ดูทีวี" },
+    { kanji: "聞く", kana: "きく", translation: "ฟัง", example_sentence: "音楽を聞きます。 / ฟังเพลง" },
+    { kanji: "話す", kana: "はなす", translation: "พูด", example_sentence: "日本語で話します。 / พูดเป็นภาษาญี่ปุ่น" },
+    { kanji: "買う", kana: "かう", translation: "ซื้อ", example_sentence: "新しい靴を買いました。 / ซื้อรองเท้าใหม่" },
+    { kanji: "安い", kana: "やすい", translation: "ถูก", example_sentence: "このりんごは安いです。 / แอปเปิลนี้ถูก" },
+    { kanji: "高い", kana: "たかい", translation: "แพง/สูง", example_sentence: "あの店は高いです。 / ร้านนั้นแพง" },
+    { kanji: "大きい", kana: "おおきい", translation: "ใหญ่", example_sentence: "大きい犬がいます。 / มีหมาตัวใหญ่" },
+    { kanji: "小さい", kana: "ちいさい", translation: "เล็ก", example_sentence: "小さい猫がいます。 / มีแมวน้อย" },
+    { kanji: "新しい", kana: "あたらしい", translation: "ใหม่", example_sentence: "新しいかばんです。 / เป็นกระเป๋าใหม่" },
+    { kanji: "古い", kana: "ふるい", translation: "เก่า", example_sentence: "古い家に住んでいます。 / อาศัยอยู่ในบ้านเก่า" },
+    { kanji: "駅", kana: "えき", translation: "สถานีรถไฟ", example_sentence: "駅まで歩きます。 / เดินไปสถานี" }
+  ],
+  n4: [
+    { kanji: "練習", kana: "れんしゅう", translation: "ฝึกฝน", example_sentence: "毎日日本語を練習します。 / ฝึกภาษาญี่ปุ่นทุกวัน" },
+    { kanji: "宿題", kana: "しゅくだい", translation: "การบ้าน", example_sentence: "宿題を終わらせました。 / ทำการบ้านเสร็จแล้ว" },
+    { kanji: "便り", kana: "たより", translation: "ข่าวคราว", example_sentence: "便りを待っています。 / รอข่าวคราว" },
+    { kanji: "問題", kana: "もんだい", translation: "ปัญหา/ข้อสอบ", example_sentence: "問題を解きます。 / แก้ปัญหา" },
+    { kanji: "全部", kana: "ぜんぶ", translation: "ทั้งหมด", example_sentence: "全部食べました。 / กินหมดแล้ว" },
+    { kanji: "必要", kana: "ひつよう", translation: "จำเป็น", example_sentence: "水が必要です。 / ต้องการน้ำ" },
+    { kanji: "準備", kana: "じゅんび", translation: "เตรียมตัว", example_sentence: "準備はいいですか。 / พร้อมหรือยัง" },
+    { kanji: "意見", kana: "いけん", translation: "ความเห็น", example_sentence: "意見を聞かせてください。 / ช่วยบอกความคิดเห็นด้วย" },
+    { kanji: "旅行", kana: "りょこう", translation: "การเดินทาง", example_sentence: "来週旅行に行きます。 / สัปดาห์หน้าจะไปเที่ยว" },
+    { kanji: "仕事", kana: "しごと", translation: "งาน", example_sentence: "仕事は忙しいです。 / งานยุ่ง" },
+    { kanji: "始まる", kana: "はじまる", translation: "เริ่มต้น", example_sentence: "授業が始まります。 / เรียนเริ่มแล้ว" },
+    { kanji: "終わる", kana: "おわる", translation: "จบ/เสร็จ", example_sentence: "映画が終わりました。 / ภาพยนตร์จบแล้ว" },
+    { kanji: "大丈夫", kana: "だいじょうぶ", translation: "ไม่เป็นไร", example_sentence: "大丈夫です。 / ไม่เป็นไร" },
+    { kanji: "簡単", kana: "かんたん", translation: "ง่าย", example_sentence: "これは簡単です。 / อันนี้ง่าย" },
+    { kanji: "悲しい", kana: "かなしい", translation: "เศร้า", example_sentence: "悲しい話を聞きました。 / ได้ยินเรื่องเศร้า" },
+    { kanji: "興味", kana: "きょうみ", translation: "ความสนใจ", example_sentence: "日本文化に興味があります。 / สนใจวัฒนธรรมญี่ปุ่น" },
+    { kanji: "空港", kana: "くうこう", translation: "สนามบิน", example_sentence: "空港まで迎えに行きます。 / จะไปรับที่สนามบิน" },
+    { kanji: "授業", kana: "じゅぎょう", translation: "ชั้นเรียน", example_sentence: "授業に遅れました。 / มาสายเรียน" },
+    { kanji: "試験", kana: "しけん", translation: "การสอบ", example_sentence: "試験の準備をしています。 / กำลังเตรียมสอบ" },
+    { kanji: "静か", kana: "しずか", translation: "สงบ", example_sentence: "図書館は静かです。 / ห้องสมุดสงบ" }
+  ],
+  n3: [
+    { kanji: "経験", kana: "けいけん", translation: "ประสบการณ์", example_sentence: "彼は豊富な経験があります。 / เขามีประสบการณ์มาก" },
+    { kanji: "注意", kana: "ちゅうい", translation: "ระวัง/คำเตือน", example_sentence: "車に注意してください。 / โปรดระวังรถ" },
+    { kanji: "文化", kana: "ぶんか", translation: "วัฒนธรรม", example_sentence: "日本の文化を学びます。 / เรียนรู้วัฒนธรรมญี่ปุ่น" },
+    { kanji: "必要性", kana: "ひつようせい", translation: "ความจำเป็น", example_sentence: "早寝の必要性を感じます。 / รู้สึกว่าการนอนเร็วจำเป็น" },
+    { kanji: "予習", kana: "よしゅう", translation: "การเตรียมล่วงหน้า", example_sentence: "授業の予習をします。 / เตรียมบทเรียนล่วงหน้า" },
+    { kanji: "結果", kana: "けっか", translation: "ผลลัพธ์", example_sentence: "試験の結果を見ました。 / ดูผลสอบแล้ว" },
+    { kanji: "世話", kana: "せわ", translation: "การดูแล", example_sentence: "犬の世話をしています。 / ดูแลสุนัขอยู่" },
+    { kanji: "理由", kana: "りゆう", translation: "เหตุผล", example_sentence: "理由を教えてください。 / กรุณาบอกเหตุผล" },
+    { kanji: "相談", kana: "そうだん", translation: "ปรึกษา", example_sentence: "先生に相談します。 / ปรึกษาครู" },
+    { kanji: "成績", kana: "せいせき", translation: "ผลการเรียน", example_sentence: "成績がよくなりました。 / ผลการเรียนดีขึ้น" },
+    { kanji: "失敗", kana: "しっぱい", translation: "ความล้มเหลว", example_sentence: "失敗から学びます。 / เรียนรู้จากความล้มเหลว" },
+    { kanji: "発表", kana: "はっぴょう", translation: "การนำเสนอ", example_sentence: "明日発表があります。 / พรุ่งนี้มีการนำเสนอ" },
+    { kanji: "進む", kana: "すすむ", translation: "ก้าวหน้า/เดินหน้า", example_sentence: "研究が進んでいます。 / งานวิจัยกำลังดำเนินไป" },
+    { kanji: "解決", kana: "かいけつ", translation: "แก้ไขปัญหา", example_sentence: "問題を解決しました。 / แก้ปัญหาเรียบร้อยแล้ว" },
+    { kanji: "理解", kana: "りかい", translation: "ความเข้าใจ", example_sentence: "よく理解できました。 / เข้าใจดีแล้ว" },
+    { kanji: "関係", kana: "かんけい", translation: "ความสัมพันธ์", example_sentence: "家族関係は大切です。 / ความสัมพันธ์ในครอบครัวสำคัญ" },
+    { kanji: "努力", kana: "どりょく", translation: "ความพยายาม", example_sentence: "努力を続けます。 / จะพยายามต่อไป" },
+    { kanji: "発展", kana: "はってん", translation: "การพัฒนา", example_sentence: "都市は発展しています。 / เมืองกำลังพัฒนา" },
+    { kanji: "表現", kana: "ひょうげん", translation: "การแสดงออก", example_sentence: "適切な表現を使います。 / ใช้การแสดงออกที่เหมาะสม" },
+    { kanji: "経験者", kana: "けいけんしゃ", translation: "ผู้มีประสบการณ์", example_sentence: "経験者の意見を聞きました。 / ฟังความคิดเห็นของผู้มีประสบการณ์" }
+  ],
+  n2: [
+    { kanji: "挑戦", kana: "ちょうせん", translation: "ความท้าทาย", example_sentence: "新しい仕事に挑戦します。 / ท้าทายงานใหม่" },
+    { kanji: "拡大", kana: "かくだい", translation: "การขยาย", example_sentence: "会社が拡大しています。 / บริษัทกำลังขยาย" },
+    { kanji: "減少", kana: "げんしょう", translation: "การลดลง", example_sentence: "人口が減少しています。 / ประชากรกำลังลดลง" },
+    { kanji: "発言", kana: "はつげん", translation: "การกล่าวแสดง", example_sentence: "彼の発言に驚きました。 / ตกใจคำกล่าวของเขา" },
+    { kanji: "割合", kana: "わりあい", translation: "สัดส่วน", example_sentence: "成功者の割合が上がっています。 / สัดส่วนผู้ประสบความสำเร็จเพิ่มขึ้น" },
+    { kanji: "影響", kana: "えいきょう", translation: "ผลกระทบ", example_sentence: "環境に影響があります。 / มีผลกระทบต่อสิ่งแวดล้อม" },
+    { kanji: "創造", kana: "そうぞう", translation: "การสร้างสรรค์", example_sentence: "新しいアイデアを創造します。 / สร้างสรรค์ไอเดียใหม่" },
+    { kanji: "維持", kana: "いじ", translation: "การรักษาไว้", example_sentence: "健康を維持したいです。 / อยากรักษาสุขภาพ" },
+    { kanji: "証明", kana: "しょうめい", translation: "การพิสูจน์", example_sentence: "本人であることを証明します。 / พิสูจน์ว่าเป็นตัวจริง" },
+    { kanji: "達成", kana: "たっせい", translation: "การบรรลุ", example_sentence: "目標を達成しました。 / บรรลุเป้าหมายแล้ว" },
+    { kanji: "責任", kana: "せきにん", translation: "ความรับผิดชอบ", example_sentence: "責任を持って行動します。 / ปฏิบัติอย่างรับผิดชอบ" },
+    { kanji: "改革", kana: "かいかく", translation: "การปฏิรูป", example_sentence: "制度を改革します。 / ปฏิรูประบบ" },
+    { kanji: "信用", kana: "しんよう", translation: "ความเชื่อถือ", example_sentence: "信用を失いたくないです。 / ไม่อยากเสื่อมเสียความเชื่อถือ" },
+    { kanji: "解釈", kana: "かいしゃく", translation: "การตีความ", example_sentence: "その話の解釈は難しいです。 / การตีความเรื่องนั้นยาก" },
+    { kanji: "合意", kana: "ごうい", translation: "ความเห็นชอบ", example_sentence: "皆の合意が必要です。 / จำเป็นต้องได้รับความเห็นชอบของทุกคน" },
+    { kanji: "妥協", kana: "だきょう", translation: "การประนีประนอม", example_sentence: "妥協点を探します。 / จะหาจุดประนีประนอม" },
+    { kanji: "施行", kana: "しこう", translation: "การบังคับใช้", example_sentence: "新しい法が施行されました。 / กฎหมายใหม่มีผลบังคับใช้แล้ว" },
+    { kanji: "概念", kana: "がいねん", translation: "แนวคิด", example_sentence: "新しい概念を理解しました。 / เข้าใจแนวคิดใหม่แล้ว" },
+    { kanji: "適応", kana: "てきおう", translation: "การปรับตัว", example_sentence: "環境に適応する必要があります。 / จำเป็นต้องปรับตัวเข้ากับสิ่งแวดล้อม" },
+    { kanji: "対処", kana: "たいしょ", translation: "การจัดการ", example_sentence: "問題に対処します。 / จัดการกับปัญหา" }
+  ],
+  n1: [
+    { kanji: "依然として", kana: "いぜんとして", translation: "ยังคง", example_sentence: "状況は依然として厳しいです。 / สถานการณ์ยังคงเข้มงวด" },
+    { kanji: "乏しい", kana: "とぼしい", translation: "ขาดแคลน", example_sentence: "資源が乏しい地域です。 / เป็นพื้นที่ที่ขาดแคลนทรัพยากร" },
+    { kanji: "概略", kana: "がいりゃく", translation: "ภาพรวม", example_sentence: "概略を説明してください。 / กรุณาอธิบายภาพรวม" },
+    { kanji: "興奮", kana: "こうふん", translation: "ตื่นเต้น", example_sentence: "試合に興奮しました。 / ตื่นเต้นกับการแข่งขัน" },
+    { kanji: "慎重", kana: "しんちょう", translation: "ระมัดระวัง", example_sentence: "慎重に進めます。 / ดำเนินการอย่างระมัดระวัง" },
+    { kanji: "洞察", kana: "どうさつ", translation: "การมองทะลุ", example_sentence: "洞察力が求められます。 / ต้องการความสามารถมองทะลุ" },
+    { kanji: "模索", kana: "もさく", translation: "การค้นหา/สำรวจ", example_sentence: "解決策を模索しています。 / กำลังค้นหาทางแก้ปัญหา" },
+    { kanji: "規模", kana: "きぼ", translation: "ขนาด", example_sentence: "プロジェクトの規模が大きいです。 / ขนาดโครงการใหญ่" },
+    { kanji: "顕著", kana: "けんちょ", translation: "โดดเด่น", example_sentence: "成果が顕著でした。 / ผลลัพธ์โดดเด่น" },
+    { kanji: "敏感", kana: "びんかん", translation: "ไวต่อ", example_sentence: "季節の変化に敏感です。 / ไวต่อการเปลี่ยนแปลงของฤดู" },
+    { kanji: "熟練", kana: "じゅくれん", translation: "มีฝีมือ", example_sentence: "熟練した技術者です。 / เป็นผู้เชี่ยวชาญที่มีฝีมือ" },
+    { kanji: "崩壊", kana: "ほうかい", translation: "การพังทลาย", example_sentence: "体制は崩壊しました。 / ระบอบล่มสลายแล้ว" },
+    { kanji: "拒否", kana: "きょひ", translation: "การปฏิเสธ", example_sentence: "申し出を拒否しました。 / ปฏิเสธข้อเสนอแล้ว" },
+    { kanji: "顧客", kana: "こきゃく", translation: "ลูกค้า", example_sentence: "顧客の意見を聞きます。 / ฟังความคิดเห็นลูกค้า" },
+    { kanji: "展望", kana: "てんぼう", translation: "ทัศนวิสัย/ภาพรวมอนาคต", example_sentence: "未来の展望を話します。 / พูดถึงภาพรวมอนาคต" },
+    { kanji: "継続", kana: "けいぞく", translation: "การสืบต่อ", example_sentence: "継続は力なり。 / ความต่อเนื่องคือพลัง" },
+    { kanji: "提案", kana: "ていあん", translation: "ข้อเสนอ", example_sentence: "新しい提案をしました。 / เสนอข้อเสนอใหม่แล้ว" },
+    { kanji: "堅実", kana: "けんじつ", translation: "มั่นคง", example_sentence: "堅実な計画を立てます。 / วางแผนอย่างมั่นคง" },
+    { kanji: "卓越", kana: "たくえつ", translation: "ความยอดเยี่ยม", example_sentence: "彼は卓越した才能があります。 / เขามีพรสวรรค์ยอดเยี่ยม" },
+    { kanji: "脱落", kana: "だつらく", translation: "การหลุดวงจร", example_sentence: "競争から脱落しました。 / หลุดออกจากการแข่งขัน" }
+  ]
+};
+</script>
+</body>
+</html>

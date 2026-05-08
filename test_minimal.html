@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Flashcard ญี่ปุ่น JLPT - Test</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 20px; }
+button { margin: 5px; padding: 10px; }
+.card { border: 1px solid #ccc; padding: 20px; margin: 20px; min-height: 200px; }
+</style>
+</head>
+<body>
+<h1>Flashcard Test</h1>
+<div id="menuPanel">
+  <button class="level-btn" data-level="n5">N5</button>
+</div>
+<div id="cardPanel" hidden>
+  <div class="card" id="flashcard">
+    <div id="cardFront">Test</div>
+  </div>
+  <button id="flipBtn">Flip</button>
+  <button id="nextBtn">Next</button>
+</div>
+<script>
+console.log('Script loaded');
+
+const menuPanel = document.getElementById('menuPanel');
+const cardPanel = document.getElementById('cardPanel');
+const cardFront = document.getElementById('cardFront');
+const flipBtn = document.getElementById('flipBtn');
+const nextBtn = document.getElementById('nextBtn');
+const levelButtons = document.querySelectorAll('.level-btn');
+
+let currentDeck = [];
+let currentIndex = 0;
+let isFlipped = false;
+
+const vocabData = {
+  n5: [
+    { kanji: "今日", kana: "きょう", translation: "วันนี้", example_sentence: "今日は雨です。 / วันนี้ฝนตก" }
+  ]
+};
+
+function showPanel(panel) {
+  menuPanel.hidden = panel !== menuPanel;
+  cardPanel.hidden = panel !== cardPanel;
+}
+
+function renderCard() {
+  if (currentDeck.length > 0) {
+    const item = currentDeck[currentIndex];
+    cardFront.textContent = item.kanji || item.kana;
+  }
+}
+
+function handleLevelSelection(level) {
+  currentDeck = vocabData[level].slice();
+  currentIndex = 0;
+  renderCard();
+  showPanel(cardPanel);
+}
+
+function handleFlip() {
+  console.log('Flipped:', isFlipped);
+}
+
+function handleNext() {
+  if (currentIndex + 1 < currentDeck.length) {
+    currentIndex++;
+    renderCard();
+  }
+}
+
+try {
+  levelButtons.forEach((button) => {
+    button.addEventListener('click', () => handleLevelSelection(button.dataset.level));
+  });
+  flipBtn.addEventListener('click', handleFlip);
+  nextBtn.addEventListener('click', handleNext);
+  showPanel(menuPanel);
+  console.log('Initialization complete');
+} catch (error) {
+  console.error('Error:', error);
+}
+</script>
+</body>
+</html>
