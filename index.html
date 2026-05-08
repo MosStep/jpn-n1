@@ -481,10 +481,9 @@ function handleNext() {
   renderCard();
 }
 
-try {
-  levelButtons.forEach((button) => {
-    button.addEventListener("click", () => handleLevelSelection(button.dataset.level));
-  });
+levelButtons.forEach((button) => {
+  button.addEventListener("click", () => handleLevelSelection(button.dataset.level));
+});
   flipBtn.addEventListener("click", handleFlip);
   speakBtn.addEventListener("click", handleSpeak);
   playReadingBtn.addEventListener("click", handleSpeak);
@@ -516,14 +515,11 @@ try {
 
   loadVoice();
   showPanel(menuPanel);
-console.log('Flashcard app initialized successfully');
+  console.log('Flashcard app initialized successfully');
 } catch (error) {
-console.error('JavaScript initialization error:', error);
+  console.error('JavaScript initialization error:', error);
 }
 });
-} catch (error) {
-  console.error("JavaScript initialization error:", error);
-}
 
 const vocabData = {
   n5: [
